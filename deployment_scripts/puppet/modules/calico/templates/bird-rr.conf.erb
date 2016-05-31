@@ -1,0 +1,50 @@
+# Configure logging
+log syslog { debug, trace, info, remote, warning, error, auth, fatal, bug };
+log stderr all;
+#log "tmp" all;
+# Override router ID
+router id <%= @src_addr %>;
+filter import_kernel {
+if ( net != 0.0.0.0/0 ) then {
+   accept;
+   }
+reject;
+}
+# Turn on global debugging of all protocols
+debug protocols all;
+# This pseudo-protocol watches all interface up/down events.
+protocol device {
+  scan time 2;    # Scan interfaces every 10 seconds
+}
+
+# Include custom config
+include "/etc/bird/custom.conf";
+
+<%- @rr_servers.each do |rr_server| -%>
+<%- unless rr_server == @src_addr -%>
+protocol bgp '<%= rr_server %>' {
+  local as <%= @asnumber %>;
+  neighbor <%= rr_server %> as <%= @asnumber %>;
+  description "Route Reflector <%= rr_server %>";
+  multihop;
+  rr cluster id 1.2.3.4;
+  import all;
+  export all;
+  source address <%= @src_addr %>;
+}
+<%- end -%>
+<%- end -%>
+
+<%- @rr_clients.each do |rr_client| -%>
+protocol bgp '<%= rr_client %>' {
+  local as <%= @asnumber %>;
+  neighbor <%= rr_client %> as <%= @asnumber %>;
+  description "Client <%= rr_client %>";
+  multihop;
+  rr client;
+  rr cluster id 1.2.3.4;
+  import all;
+  export all;
+  source address <%= @src_addr %>;
+}
+<%- end -%>

@@ -1,0 +1,9 @@
+- name: 'network:neutron:ml2:calico'
+  label: 'Calico'
+  description: 'Calico SDN networking'
+  bind: !!pairs
+    - "cluster:net_provider": "neutron"
+    - "cluster:net_segment_type": "vlan"
+  compatible:
+    - name: 'hypervisor:kvm'
+    - name: 'hypervisor:qemu'

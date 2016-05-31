@@ -1,0 +1,5 @@
+[global]
+EtcdAddr = localhost:<%= scope.lookupvar('calico::params::etcd_port') %>
+#FelixHostname = hostname
+MetadataAddr = <%= scope.lookupvar('calico::params::mgmt_vip') %>
+MetadataPort = 8775

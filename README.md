@@ -31,7 +31,8 @@ None.
 Compatible versions:
 --------------------
 
-	Mirantis Fuel 7.0
+	Mirantis Fuel 8.0
+	Mirantis Fuel 9.0
 
 To build the plugin:
 --------------------
@@ -50,7 +51,7 @@ To build the plugin:
 
 		fpb --build .
 
-- Check that the file calico-fuel-plugin-2.0-2.0.0-0.noarch.rpm was created.
+- Check that the file calico-fuel-plugin-3.0-3.0.0-0.noarch.rpm was created.
 
 
 To install the plugin:
@@ -60,13 +61,13 @@ To install the plugin:
 
 - Copy the plugin onto the fuel master node:
 
-		scp calico-fuel-plugin-2.0-2.0.0-0.noarch.rpm root@<Fuel_Master_Node_IP>:/tmp
+		scp calico-fuel-plugin-3.0-3.0.0-0.noarch.rpm root@<Fuel_Master_Node_IP>:/tmp
 
 - Install the plugin on the fuel master node:
 
 		cd /tmp
 
-		fuel plugins --install calico-fuel-plugin-2.0-2.0.0-0.noarch.rpm
+		fuel plugins --install calico-fuel-plugin-3.0-3.0.0-0.noarch.rpm
 
 - Check the plugin was installed:
 
@@ -81,9 +82,10 @@ OpenStack cluster in the usual way, with the following guidelines:
 
 - Create a new OpenStack environment, selecting:
 
-	Kilo on Ubuntu Trusty
+    Liberty on Ubuntu Trusty ( For Fuel 8.0 )
+	Mitaka on Ubuntu Trusty ( For Fuel 9.0 )
 
-	"Neutron with VLAN segmentation" as the networking setup
+	"Calico" as the networking setup
 
 - Under the settings tab, make sure the following options are checked:
 

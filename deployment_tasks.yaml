@@ -1,0 +1,127 @@
+##############################################################
+#  Common tasks section
+##############################################################
+
+# Set proper apt pin for Contrail repository
+- id: common-repo
+  type: puppet
+  version: 2.0.0
+  groups: [primary-controller,controller,compute]
+  required_for: [tools]
+  requires: [deploy_start, globals, setup_repositories]
+  parameters:
+    puppet_manifest: puppet/manifests/repo.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+
+##############################################################
+#  Openstack Controller tasks section
+##############################################################
+
+# Skip L2, L3, DHCP and Metadata Neutron agents
+- id: primary-openstack-network-agents-l3
+  roles: '*'
+  type: skipped
+  version: 2.0.0
+- id: openstack-network-agents-l3
+  roles: '*'
+  type: skipped
+  version: 2.0.0
+- id: primary-openstack-network-plugins-l2
+  roles: '*'
+  type: skipped
+  version: 2.0.0
+- id: openstack-network-plugins-l2
+  roles: '*'
+  type: skipped
+  version: 2.0.0
+- id: primary-openstack-network-agents-dhcp
+  roles: '*'
+  type: skipped
+  version: 2.0.0
+- id: openstack-network-agents-dhcp
+  roles: '*'
+  type: skipped
+  version: 2.0.0
+- id: primary-openstack-network-agents-metadata
+  roles: '*'
+  type: skipped
+  version: 2.0.0
+- id: openstack-network-agents-metadata
+  roles: '*'
+  type: skipped
+  version: 2.0.0
+# Skip default fuel networks and routers
+- id: openstack-network-networks
+  roles: '*'
+  type: skipped
+  version: 2.0.0
+- id: openstack-network-routers
+  roles: '*'
+  type: skipped
+  version: 2.0.0
+
+# Configuration for etcd, bird and neutron on OpenStack Controllers
+- id: controller-calico
+  type: puppet
+  version: 2.0.0
+  groups: [primary-controller, controller]
+  required_for: [deploy_end]
+  requires: [controller_remaining_tasks]
+  parameters:
+    puppet_manifest: puppet/manifests/controller.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
+# Create overrides for Hiera on Controllers: calico-specific predefined_nets
+#- id: controller-hiera
+#  type: puppet
+#  version: 2.0.0
+#  role: [primary-controller,controller]
+#  required_for: [deploy_end]
+#  requires: [openstack-network-end]
+#  parameters:
+#    puppet_manifest: puppet/manifests/controller-hiera.pp
+#    puppet_modules: puppet/modules:/etc/puppet/modules
+#    timeout: 120
+
+# Create networks for ostf-tests
+#- id: openstack-controller-provision
+#  type: puppet
+#  version: 2.0.0
+#  role: [primary-controller]
+#  required_for: [deploy_end]
+#  requires: [controller-hiera]
+#  cross-depends:
+#    - name: /(primary-)?openstack-controller$/
+#      role: self
+#    - name: /openstack-network-end/
+#      role: self
+#  strategy:
+#    type: one-by-one
+#  parameters:
+#    puppet_manifest: puppet/manifests/controller-provision.pp
+#    puppet_modules: puppet/modules:/etc/puppet/modules
+#    timeout: 720
+
+##############################################################
+#  Openstack Compute tasks section
+##############################################################
+
+# Workaround for #1550450
+- id: enable_nova_compute_service
+  type: skipped
+  version: 2.0.0
+
+# Deployment of etcd-proxy, bird and calico on OpenStack Computes
+- id: compute-calico
+  type: puppet
+  version: 2.0.0
+  groups: [compute]
+  required_for: [deploy_end]
+  requires: [top-role-compute, enable_nova_compute_service, openstack-network-end]
+  parameters:
+    puppet_manifest: puppet/manifests/compute.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
